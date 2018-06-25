@@ -9,16 +9,14 @@ import java.util.concurrent.ExecutionException;
  * that are considered clustered. This functionality serves to help synchronize
  * state between application nodes so that meaningful and stateful load balancing
  * may occur.
- *
- * @param <CM> Cluster member implementation.
  */
-public interface ClusterManager<CM extends ClusterMember> {
+public interface ClusterManager {
     /**
      * Returns the set of cluster members that will share workloads.
      *
      * @return the set of cluster members that will share workloads.
      */
-    List<CM> getClusterMembers();
+    List<ClusterMember> getClusterMembers();
 
     /**
      * Retrieves a distributed property.
@@ -84,7 +82,7 @@ public interface ClusterManager<CM extends ClusterMember> {
      * @throws ExecutionException   when an error during execution occurs.
      * @throws InterruptedException when the processes is interrupted.
      */
-    <T> Map<CM, ? extends T> submitInstructions(Map<CM, ? extends Instruction<? extends T>> instructions) throws ExecutionException, InterruptedException;
+    <T> Map<ClusterMember, ? extends T> submitInstructions(Map<ClusterMember, ? extends Instruction<? extends T>> instructions) throws ExecutionException, InterruptedException;
 
     /**
      * Submits an instruction to all cluster members.
@@ -95,5 +93,5 @@ public interface ClusterManager<CM extends ClusterMember> {
      * @throws ExecutionException   when an error during execution occurs.
      * @throws InterruptedException when the processes is interrupted.
      */
-    <T> Map<CM, T> submitInstruction(Instruction<? extends T> instruction) throws ExecutionException, InterruptedException;
+    <T> Map<ClusterMember, T> submitInstruction(Instruction<? extends T> instruction) throws ExecutionException, InterruptedException;
 }

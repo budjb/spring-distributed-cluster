@@ -8,7 +8,7 @@ import com.budjb.spring.distributed.cluster.Instruction
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 
-class TestClusterManager extends AbstractClusterManager<TestClusterMember> {
+class TestClusterManager extends AbstractClusterManager {
     List<TestClusterMember> clusterMembers = []
     Map<ClusterMember, List<Instruction<?>>> instructions = [:]
     Map<String, Object> properties = [:]
@@ -18,7 +18,7 @@ class TestClusterManager extends AbstractClusterManager<TestClusterMember> {
     }
 
     @Override
-    <T> Future<T> submitInstruction(TestClusterMember clusterMember, Instruction<? extends T> instruction) {
+    <T> Future<T> submitInstruction(ClusterMember clusterMember, Instruction<? extends T> instruction) {
         if (!instructions.containsKey(clusterMember)) {
             instructions.put(clusterMember, [])
         }

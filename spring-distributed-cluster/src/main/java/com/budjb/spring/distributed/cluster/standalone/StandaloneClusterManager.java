@@ -1,9 +1,6 @@
 package com.budjb.spring.distributed.cluster.standalone;
 
-import com.budjb.spring.distributed.cluster.AbstractClusterManager;
-import com.budjb.spring.distributed.cluster.ClusterConfigurationProperties;
-import com.budjb.spring.distributed.cluster.ClusterManager;
-import com.budjb.spring.distributed.cluster.Instruction;
+import com.budjb.spring.distributed.cluster.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -21,7 +18,7 @@ import java.util.concurrent.Future;
  * An implementation of {@link ClusterManager} that only contains a single node. While this class may seem to violate
  * the purpose of the library, this implementation is useful for local developing and testing.
  */
-public class StandaloneClusterManager extends AbstractClusterManager<StandaloneClusterMember> implements ApplicationContextAware {
+public class StandaloneClusterManager extends AbstractClusterManager implements ApplicationContextAware {
     /**
      * Executor service.
      */
@@ -32,7 +29,7 @@ public class StandaloneClusterManager extends AbstractClusterManager<StandaloneC
      * <p>
      * This will only ever contain one, but we maintain a list to meet the API contract.
      */
-    private final List<StandaloneClusterMember> clusterMembers;
+    private final List<ClusterMember> clusterMembers;
 
     /**
      * Properties map.
@@ -79,7 +76,7 @@ public class StandaloneClusterManager extends AbstractClusterManager<StandaloneC
      */
     @Override
     @SuppressWarnings("unchecked")
-    protected <T> Future<? extends T> submitInstruction(StandaloneClusterMember clusterMember, Instruction<? extends T> instruction) {
+    protected <T> Future<? extends T> submitInstruction(ClusterMember clusterMember, Instruction<? extends T> instruction) {
         beanFactory.autowireBean(instruction);
         instruction = (Instruction<? extends T>) beanFactory.initializeBean(instruction, instruction.getClass().getName());
         return executorService.submit(instruction);
@@ -97,7 +94,7 @@ public class StandaloneClusterManager extends AbstractClusterManager<StandaloneC
      * {@inheritDoc}
      */
     @Override
-    public List<StandaloneClusterMember> getClusterMembers() {
+    public List<ClusterMember> getClusterMembers() {
         return clusterMembers;
     }
 

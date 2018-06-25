@@ -12,10 +12,8 @@ import java.util.concurrent.Future;
 /**
  * A (slightly opinionated) base implementation of {@link ClusterManager}. This implementation assumes that
  * distributed properties are contained in some distributed {@link Map}.
- *
- * @param <M> type of the cluster member.
  */
-public abstract class AbstractClusterManager<M extends ClusterMember> implements ClusterManager<M> {
+public abstract class AbstractClusterManager implements ClusterManager {
     /**
      * Cluster properties.
      */
@@ -43,7 +41,7 @@ public abstract class AbstractClusterManager<M extends ClusterMember> implements
      * @param <T>           The return type of the instruction.
      * @return Results of the instruction.
      */
-    protected abstract <T> Future<? extends T> submitInstruction(M clusterMember, Instruction<? extends T> instruction);
+    protected abstract <T> Future<? extends T> submitInstruction(ClusterMember clusterMember, Instruction<? extends T> instruction);
 
     /**
      * Returns the map that backs distributed properties.
@@ -56,10 +54,10 @@ public abstract class AbstractClusterManager<M extends ClusterMember> implements
      * {@inheritDoc}
      */
     @Override
-    public <T> Map<M, T> submitInstruction(Instruction<? extends T> instruction) throws ExecutionException, InterruptedException {
-        Map<M, Instruction<? extends T>> instructions = new HashMap<>();
+    public <T> Map<ClusterMember, T> submitInstruction(Instruction<? extends T> instruction) throws ExecutionException, InterruptedException {
+        Map<ClusterMember, Instruction<? extends T>> instructions = new HashMap<>();
 
-        for (M member : getClusterMembers()) {
+        for (ClusterMember member : getClusterMembers()) {
             instructions.put(member, instruction);
         }
 
@@ -70,10 +68,10 @@ public abstract class AbstractClusterManager<M extends ClusterMember> implements
      * {@inheritDoc}
      */
     @Override
-    public <T> Map<M, T> submitInstructions(Map<M, ? extends Instruction<? extends T>> instructions) throws ExecutionException, InterruptedException {
-        Map<M, Future<? extends T>> futures = new HashMap<>();
+    public <T> Map<ClusterMember, T> submitInstructions(Map<ClusterMember, ? extends Instruction<? extends T>> instructions) throws ExecutionException, InterruptedException {
+        Map<ClusterMember, Future<? extends T>> futures = new HashMap<>();
 
-        for (Map.Entry<M, ? extends Instruction<? extends T>> assignment : instructions.entrySet()) {
+        for (Map.Entry<ClusterMember, ? extends Instruction<? extends T>> assignment : instructions.entrySet()) {
             if (assignment.getValue() != null) {
                 futures.put(assignment.getKey(), submitInstruction(assignment.getKey(), assignment.getValue()));
             }
@@ -81,12 +79,12 @@ public abstract class AbstractClusterManager<M extends ClusterMember> implements
 
         long end = System.currentTimeMillis() + clusterConfigurationProperties.getInstructionTimeout();
 
-        Map<M, T> results = new HashMap<>();
+        Map<ClusterMember, T> results = new HashMap<>();
 
         while (futures.size() > 0 && System.currentTimeMillis() < end) {
-            Iterator<Map.Entry<M, Future<? extends T>>> iterator = futures.entrySet().iterator();
+            Iterator<Map.Entry<ClusterMember, Future<? extends T>>> iterator = futures.entrySet().iterator();
             while (iterator.hasNext()) {
-                Map.Entry<M, Future<? extends T>> entry = iterator.next();
+                Map.Entry<ClusterMember, Future<? extends T>> entry = iterator.next();
                 if (entry.getValue().isDone()) {
                     results.put(entry.getKey(), entry.getValue().get());
                     iterator.remove();
@@ -95,7 +93,7 @@ public abstract class AbstractClusterManager<M extends ClusterMember> implements
         }
 
         if (futures.size() > 0) {
-            for (Map.Entry<M, Future<? extends T>> entry : futures.entrySet()) {
+            for (Map.Entry<ClusterMember, Future<? extends T>> entry : futures.entrySet()) {
                 log.error("Cluster member " + entry.getKey().toString() + " did not complete its instructions within " + clusterConfigurationProperties.getInstructionTimeout() + " milliseconds");
             }
         }

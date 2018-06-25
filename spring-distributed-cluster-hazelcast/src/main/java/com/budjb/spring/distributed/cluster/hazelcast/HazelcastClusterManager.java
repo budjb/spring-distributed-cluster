@@ -1,9 +1,6 @@
 package com.budjb.spring.distributed.cluster.hazelcast;
 
-import com.budjb.spring.distributed.cluster.AbstractClusterManager;
-import com.budjb.spring.distributed.cluster.ClusterConfigurationProperties;
-import com.budjb.spring.distributed.cluster.ClusterManager;
-import com.budjb.spring.distributed.cluster.Instruction;
+import com.budjb.spring.distributed.cluster.*;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.core.Member;
@@ -18,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * A {@link ClusterManager} implementation backed by Hazelcast.
  */
-public class HazelcastClusterManager extends AbstractClusterManager<HazelcastClusterMember> implements InitializingBean {
+public class HazelcastClusterManager extends AbstractClusterManager implements InitializingBean {
     /**
      * Name of the com.budjb.spring.lock.distributed map to store time markers.
      */
@@ -54,7 +51,7 @@ public class HazelcastClusterManager extends AbstractClusterManager<HazelcastClu
      * {@inheritDoc}
      */
     @Override
-    public List<HazelcastClusterMember> getClusterMembers() {
+    public List<ClusterMember> getClusterMembers() {
         return hazelcastInstance.getCluster().getMembers().stream().map(HazelcastClusterMember::new).collect(Collectors.toList());
     }
 
@@ -62,10 +59,10 @@ public class HazelcastClusterManager extends AbstractClusterManager<HazelcastClu
      * {@inheritDoc}
      */
     @Override
-    protected <T> Future<T> submitInstruction(HazelcastClusterMember clusterMember, Instruction<? extends T> instruction) {
+    protected <T> Future<T> submitInstruction(ClusterMember clusterMember, Instruction<? extends T> instruction) {
         return executorService.submit(
             new AutowiringCallableWrapper<>(instruction),
-            new SingleMemberSelector(clusterMember.getMember())
+            new SingleMemberSelector(((HazelcastClusterMember) clusterMember).getMember())
         );
     }
 
