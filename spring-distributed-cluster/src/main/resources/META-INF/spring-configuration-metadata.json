@@ -1,0 +1,19 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.budjb.spring.distributed.cluster.ClusterConfigurationProperties",
+      "name": "cluster",
+      "type": "com.budjb.spring.distributed.cluster.ClusterConfigurationProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.budjb.spring.distributed.cluster.ClusterConfigurationProperties",
+      "defaultValue": 120000,
+      "name": "cluster.instruction-timeout",
+      "description": "How long the cluster manager should wait for instructions to finish before giving up.",
+      "type": "java.lang.Long"
+    }
+  ]
+}

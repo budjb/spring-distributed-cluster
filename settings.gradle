@@ -1,0 +1,3 @@
+rootProject.name = 'spring-distributed-cluster'
+include 'spring-distributed-cluster'
+include 'spring-distributed-cluster-hazelcast'
