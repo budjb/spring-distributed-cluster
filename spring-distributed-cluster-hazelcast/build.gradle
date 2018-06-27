@@ -82,6 +82,10 @@ bintray {
             name = project.version
             released = new Date()
             vcsTag = project.version
+            gpg {
+                sign = true
+                passphrase = System.getenv('GPG_PASSWORD')
+            }
         }
     }
 }
