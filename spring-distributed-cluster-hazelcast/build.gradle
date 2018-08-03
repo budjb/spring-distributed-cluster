@@ -5,8 +5,6 @@ dependencyManagement {
 dependencies {
     compile project(':spring-distributed-cluster')
 
-//    compile 'org.springframework.boot:spring-boot-starter'
-//    compile 'javax.validation:validation-api'
     compile 'com.budjb:spring-distributed-locks-hazelcast:0.1.1.BETA'
     compile 'com.hazelcast:hazelcast-all:3.9.1'
 
